@@ -3,10 +3,10 @@ from django.db import models
 
 
 class User(AbstractUser):
-    wallet = models.PositiveIntegerField(default=1000)
+    total_spent = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'Name: {self.username}'
+        return f'Name: {self.username} Total: {self.total_spent}'
 
 
 class Hall(models.Model):
@@ -14,25 +14,34 @@ class Hall(models.Model):
     size = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'Name: {self.name} Size: {self.size}'
+        return f'Color: {self.name} Size: {self.size}'
 
 
-class Ticket(models.Model):
+class Film(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=1000)
-    time_start = models.DateTimeField()
-    time_end = models.DateTimeField()
-    screening_date = models.DateTimeField()
-    price = models.PositiveIntegerField()
-    rest_of_seats = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'Name: {self.name} Price: {self.price}'
+        return f'{self.name}'
+
+
+class Session(models.Model):
+    time_start = models.TimeField()
+    time_end = models.TimeField()
+    date_start = models.DateField()
+    date_finish = models.DateField()
+    price = models.PositiveIntegerField()
+    rest_of_seats = models.PositiveIntegerField()
+    hall = models.ForeignKey(Hall, on_delete=models.CASCADE)
+    film = models.ForeignKey(Film, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f' {self.film}'
 
 
 class Purchase(models.Model):
     amount = models.PositiveIntegerField()
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Session, on_delete=models.CASCADE)
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
